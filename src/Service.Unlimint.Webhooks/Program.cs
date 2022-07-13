@@ -10,7 +10,7 @@ using MyJetWallet.Sdk.Service;
 using MySettingsReader;
 using Service.Unlimint.Webhooks.Settings;
 
-namespace Service.Unlimint.Webhooks
+namespace Service.Circle.Webhooks
 {
     public class Program
     {
@@ -32,7 +32,7 @@ namespace Service.Unlimint.Webhooks
 
         public static void Main(string[] args)
         {
-            Console.Title = "MyJetWallet Service.Unlimint.Webhooks";
+            Console.Title = "MyJetWallet Service.Circle.Webhooks";
 
             Settings = SettingsReader.GetSettings<SettingsModel>(SettingsFileName);
 

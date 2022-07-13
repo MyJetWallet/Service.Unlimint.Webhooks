@@ -1,6 +1,6 @@
 ﻿using Autofac;
 
-namespace Service.Unlimint.Webhooks.Modules
+namespace Service.Circle.Webhooks.Modules
 {
     public class SettingsModule : Module
     {

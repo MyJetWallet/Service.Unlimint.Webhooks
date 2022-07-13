@@ -5,4 +5,9 @@
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="MyJetWallet.Service.Unlimint.Signer.Client" Version="2.0.5" />
+    <PackageReference Include="MyJetWallet.Unlimint" Version="2.0.5" />
+  </ItemGroup>
+
 </Project>

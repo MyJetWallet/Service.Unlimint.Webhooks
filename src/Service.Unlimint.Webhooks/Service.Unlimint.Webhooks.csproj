@@ -15,6 +15,10 @@
     <PackageReference Include="MyJetWallet.Sdk.GrpcMetrics" Version="2.0.4" />
     <PackageReference Include="MyJetWallet.Sdk.GrpcSchema" Version="1.0.6" />
     <PackageReference Include="MyJetWallet.Sdk.Service" Version="2.2.4" />
+    <PackageReference Include="MyJetWallet.Sdk.ServiceBus" Version="2.2.4" />
+    <PackageReference Include="MyJetWallet.Service.Bitgo.DepositDetector.Client" Version="2.3.8" />
+    <PackageReference Include="MyJetWallet.Service.Unlimint.Signer.Client" Version="2.0.5" />
+    <PackageReference Include="MyJetWallet.Unlimint" Version="2.0.5" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="prometheus-net.AspNetCore" Version="6.0.0" />
     <PackageReference Include="protobuf-net.Grpc.AspNetCore" Version="1.0.152" />
@@ -24,6 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Service.Unlimint.Webhook.ServiceBus\Service.Unlimint.Webhook.ServiceBus.csproj" />
     <ProjectReference Include="..\Service.Unlimint.Webhooks.Domain\Service.Unlimint.Webhooks.Domain.csproj" />
     <ProjectReference Include="..\Service.Unlimint.Webhooks.Grpc\Service.Unlimint.Webhooks.Grpc.csproj" />
   </ItemGroup>

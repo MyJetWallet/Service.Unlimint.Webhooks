@@ -1,6 +1,5 @@
 ﻿using JetBrains.Annotations;
 using MyJetWallet.Sdk.Grpc;
-using Service.Unlimint.Webhooks.Grpc;
 
 namespace Service.Unlimint.Webhooks.Client
 {
@@ -11,6 +10,6 @@ namespace Service.Unlimint.Webhooks.Client
         {
         }
 
-        public IHelloService GetHelloService() => CreateGrpcService<IHelloService>();
+        // public IHelloService GetHelloService() => CreateGrpcService<IHelloService>();
     }
 }

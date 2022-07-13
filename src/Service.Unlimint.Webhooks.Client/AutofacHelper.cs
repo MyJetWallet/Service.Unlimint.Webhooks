@@ -1,5 +1,8 @@
 ﻿using Autofac;
-using Service.Unlimint.Webhooks.Grpc;
+using DotNetCoreDecorators;
+using MyServiceBus.Abstractions;
+using MyServiceBus.TcpClient;
+using Service.Unlimint.Webhooks.Domain.Models;
 
 // ReSharper disable UnusedMember.Global
 
@@ -7,11 +10,17 @@ namespace Service.Unlimint.Webhooks.Client
 {
     public static class AutofacHelper
     {
-        public static void RegisterUnlimintWebhooksClient(this ContainerBuilder builder, string grpcServiceUrl)
+        public static void RegisterSignalUnlimintTransferSubscriber(this ContainerBuilder builder,
+            MyServiceBusTcpClient client,
+            string queueName,
+            TopicQueueType queryType)
         {
-            var factory = new UnlimintWebhooksClientFactory(grpcServiceUrl);
+            var subs = new SignalUnlimintTransferSubscriber(client, queueName, queryType);
 
-            builder.RegisterInstance(factory.GetHelloService()).As<IHelloService>().SingleInstance();
+            builder
+                .RegisterInstance(subs)
+                .As<ISubscriber<SignalUnlimintTransfer>>()
+                .SingleInstance();
         }
     }
 }
