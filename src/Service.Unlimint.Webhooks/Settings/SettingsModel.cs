@@ -25,20 +25,5 @@ namespace Service.Unlimint.Webhooks.Settings
 
         [YamlProperty("UnlimintWebhooks.UnlimintSignerGrpcServiceUrl")]
         public string UnlimintSignerGrpcServiceUrl { get; set; }
-
-        [YamlProperty("UnlimintWebhooks.WebHooksCheckerIntervalMSec")]
-        public long WebHooksCheckerIntervalMSec { get; set; }
-
-        [YamlProperty("UnlimintWebhooks.WebhooksUrl")]
-        public string WebhooksUrl { get; set; }
-
-        // [YamlProperty("UnlimintWebhooks.BlockchainWalletsGrpcServiceUrl")]
-        // public string BlockchainWalletsGrpcServiceUrl { get; internal set; }
-        //
-        // [YamlProperty("UnlimintWebhooks.CircleWalletsGrpcServiceUrl")]
-        // public string CircleWalletsGrpcServiceUrl { get; set; }
-        //
-        // [YamlProperty("UnlimintWebhooks.ClientWalletsGrpcServiceUrl")]
-        // public string ClientWalletsGrpcServiceUrl { get; internal set; }
     }
 }

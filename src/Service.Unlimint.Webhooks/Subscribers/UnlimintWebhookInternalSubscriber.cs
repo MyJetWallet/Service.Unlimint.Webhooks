@@ -18,18 +18,18 @@ namespace Service.Unlimint.Webhooks.Subscribers
     public class UnlimintWebhookInternalSubscriber
     {
         private readonly ILogger<UnlimintWebhookInternalSubscriber> _logger;
-        private readonly IUnlimintPaymentsService _circlePaymentsService;
+        private readonly IUnlimintPaymentsService _unlimintPaymentsService;
         private readonly IServiceBusPublisher<SignalUnlimintTransfer> _transferPublisher;
 
         public UnlimintWebhookInternalSubscriber(
             ILogger<UnlimintWebhookInternalSubscriber> logger,
             ISubscriber<WebhookQueueItem> subscriber, 
-            IUnlimintPaymentsService circlePaymentsService, 
+            IUnlimintPaymentsService unlimintPaymentsService, 
             IServiceBusPublisher<SignalUnlimintTransfer> transferPublisher)
         {
             subscriber.Subscribe(HandleSignal);
             _logger = logger;
-            _circlePaymentsService = circlePaymentsService;
+            _unlimintPaymentsService = unlimintPaymentsService;
             _transferPublisher = transferPublisher;
         }
 
@@ -42,45 +42,47 @@ namespace Service.Unlimint.Webhooks.Subscribers
 
             try
             {
-                var dto = JsonConvert.DeserializeObject<WebhookMiddleware.NotificationDto>(body);
-                if (dto is { Type: "Notification" })
+                var callback = JsonConvert.DeserializeObject<NotificationDto>(body);
+                if (callback != null)
                 {
-                    var message = JsonConvert.DeserializeObject<WebhookMiddleware.MessageDto>(dto.Message);
-                    if (message != null)
+                    var paymentData = JsonConvert.DeserializeObject<PaymentResponsePaymentData>(callback.PaymentData);
+                    var merchantData = JsonConvert.DeserializeObject<TransactionResponseMerchantOrder>(callback.MerchantOrder);
+
+                    if (paymentData != null)
                     {
-                        switch (message)
+                        
+                        var (brokerId, clientId, walletId) = ParseDescription(paymentData.Note);
+                        //TODO: Add to payment description BrokerID
+                        if (string.IsNullOrEmpty(brokerId))
                         {
-                            case { NotificationType: "payments" }:
-                                {
-                                    
-                                    break;
-                                }
-                            case { NotificationType: "transfers" }:
-                                {
-                                  
-                        
-                                    break;
-                                }
-                            case { NotificationType: "cards" }:
-                                {
-                                   
-                                    break;
-                                }
-                            case { NotificationType: "chargebacks" }:
-                                {
-                                   
-                        
-                                    break;
-                                }
-                            case { NotificationType: "payouts" }:
-                                {
-                                  
-                        
-                                    break;
-                                }
-                            default:
-                                _logger.LogInformation("{type} message are not supported", message.NotificationType);
-                                break;
+                            brokerId = "jetwallet";
+                        }
+                        var payment = await _unlimintPaymentsService.GetUnlimintPaymentByMerchantIdAsync(
+                            new GetPaymentByMerchantIdRequest
+                            {
+                                BrokerId = brokerId,
+                                MerchantId = merchantData?.Id
+                            });
+
+                        if (payment.Data != null)
+                        {
+                            _logger.LogInformation("GetCirclePaymentInfo payment info {paymentInfo}",
+                                Newtonsoft.Json.JsonConvert.SerializeObject(payment.Data));
+                        }
+
+                        if (payment.IsSuccess)
+                        {
+                            await _transferPublisher.PublishAsync(new SignalUnlimintTransfer()
+                            {
+                                BrokerId = brokerId,
+                                ClientId = clientId,
+                                WalletId = walletId,
+                                PaymentInfo = payment.Data
+                            });
+                        }
+                        else
+                        {
+                            _logger.LogError("Unable to get payment info {merchant id}", merchantData?.Id);
                         }
                     }
                     else
