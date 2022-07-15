@@ -46,7 +46,6 @@ namespace Service.Unlimint.Webhooks.Subscribers
                 if (callback != null)
                 {
                     var paymentData = callback.PaymentData;
-                    var merchantData = callback.MerchantOrder;
 
                     if (paymentData != null)
                     {
@@ -57,16 +56,16 @@ namespace Service.Unlimint.Webhooks.Subscribers
                         {
                             brokerId = "jetwallet";
                         }
-                        var payment = await _unlimintPaymentsService.GetUnlimintPaymentByMerchantIdAsync(
-                            new GetPaymentByMerchantIdRequest
+                        var payment = await _unlimintPaymentsService.GetUnlimintPaymentByIdAsync(
+                            new GetPaymentByIdRequest
                             {
                                 BrokerId = brokerId,
-                                MerchantId = merchantData?.Id
+                                PaymentId = callback.PaymentData.Id,
                             });
 
                         if (payment.Data != null)
                         {
-                            _logger.LogInformation("GetCirclePaymentInfo payment info {paymentInfo}",
+                            _logger.LogInformation("GetUnlimintPaymentByMerchantIdAsync payment info {paymentInfo}",
                                 Newtonsoft.Json.JsonConvert.SerializeObject(payment.Data));
                         }
 
@@ -82,7 +81,8 @@ namespace Service.Unlimint.Webhooks.Subscribers
                         }
                         else
                         {
-                            _logger.LogError("Unable to get payment info {merchant id}", merchantData?.Id);
+                            _logger.LogError("Unable to get payment info merchantId: {merchantId} paymentId:{paymentId}", 
+                                callback.MerchantOrder?.Id, paymentData.Id);
                         }
                     }
                     else
