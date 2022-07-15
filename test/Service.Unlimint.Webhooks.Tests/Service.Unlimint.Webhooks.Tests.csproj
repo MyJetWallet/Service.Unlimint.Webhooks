@@ -12,4 +12,9 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Service.Unlimint.Webhooks.Domain.Models\Service.Unlimint.Webhooks.Domain.Models.csproj" />
+    <ProjectReference Include="..\..\src\Service.Unlimint.Webhooks\Service.Unlimint.Webhooks.csproj" />
+  </ItemGroup>
+
 </Project>

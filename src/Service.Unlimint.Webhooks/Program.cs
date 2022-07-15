@@ -32,7 +32,7 @@ namespace Service.Circle.Webhooks
 
         public static void Main(string[] args)
         {
-            Console.Title = "MyJetWallet Service.Circle.Webhooks";
+            Console.Title = "MyJetWallet Service.Unlimint.Webhooks";
 
             Settings = SettingsReader.GetSettings<SettingsModel>(SettingsFileName);
 

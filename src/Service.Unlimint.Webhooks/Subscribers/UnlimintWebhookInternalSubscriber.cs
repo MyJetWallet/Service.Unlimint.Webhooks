@@ -42,11 +42,11 @@ namespace Service.Unlimint.Webhooks.Subscribers
 
             try
             {
-                var callback = JsonConvert.DeserializeObject<NotificationDto>(body);
+                var callback = JsonConvert.DeserializeObject<PaymentCallback>(body);
                 if (callback != null)
                 {
-                    var paymentData = JsonConvert.DeserializeObject<PaymentResponsePaymentData>(callback.PaymentData);
-                    var merchantData = JsonConvert.DeserializeObject<TransactionResponseMerchantOrder>(callback.MerchantOrder);
+                    var paymentData = callback.PaymentData;
+                    var merchantData = callback.MerchantOrder;
 
                     if (paymentData != null)
                     {
