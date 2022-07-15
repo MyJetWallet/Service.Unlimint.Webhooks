@@ -16,7 +16,7 @@
     <PackageReference Include="MyJetWallet.Sdk.GrpcSchema" Version="1.0.6" />
     <PackageReference Include="MyJetWallet.Sdk.Service" Version="2.2.4" />
     <PackageReference Include="MyJetWallet.Sdk.ServiceBus" Version="2.2.4" />
-    <PackageReference Include="MyJetWallet.Service.Bitgo.DepositDetector.Client" Version="2.3.8" />
+    <PackageReference Include="MyJetWallet.Service.Bitgo.DepositDetector.Client" Version="2.3.9" />
     <PackageReference Include="MyJetWallet.Service.Unlimint.Signer.Client" Version="2.0.6" />
     <PackageReference Include="MyJetWallet.Unlimint" Version="2.0.6" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
