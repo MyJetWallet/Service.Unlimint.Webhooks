@@ -51,11 +51,6 @@ namespace Service.Unlimint.Webhooks.Subscribers
                     {
                         
                         var (brokerId, clientId, walletId) = ParseDescription(paymentData.Note);
-                        //TODO: Add to payment description BrokerID
-                        if (string.IsNullOrEmpty(brokerId))
-                        {
-                            brokerId = "jetwallet";
-                        }
                         var payment = await _unlimintPaymentsService.GetUnlimintPaymentByIdAsync(
                             new GetPaymentByIdRequest
                             {
@@ -76,7 +71,23 @@ namespace Service.Unlimint.Webhooks.Subscribers
                                 BrokerId = brokerId,
                                 ClientId = clientId,
                                 WalletId = walletId,
-                                PaymentInfo = payment.Data
+                                PaymentInfo = new GetPaymentInfo
+                                {
+                                    Id = callback.PaymentData.Id,
+                                    Type = payment.Data?.Type,
+                                    MerchantId = payment.Data?.MerchantId,
+                                    MerchantWalletId = payment.Data?.MerchantWalletId,
+                                    Description = payment.Data?.Description,
+                                    Status = payment.Data?.Status,
+                                    Amount = payment.Data?.Amount,
+                                    Fee = payment.Data?.Fee,
+                                    Card = payment.Data?.Card,
+                                    TrackingRef = payment.Data?.TrackingRef,
+                                    ErrorCode = payment.Data?.ErrorCode,
+                                    Metadata = payment.Data?.Metadata,
+                                    CreateDate = payment.Data?.CreateDate,
+                                }
+                                
                             });
                         }
                         else
