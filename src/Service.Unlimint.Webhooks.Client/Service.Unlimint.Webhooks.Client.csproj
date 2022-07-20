@@ -19,7 +19,7 @@
     <PackageReference Include="MyServiceBus.TcpClient" Version="2.4.6" />
     <PackageReference Include="SimpleTrading.ServiceBus.CommonUtils" Version="1.0.1" />
     <PackageReference Include="System.ServiceModel.Primitives" Version="4.9.0" />
-    <PackageReference Include="protobuf-net.Grpc" Version="1.0.152" />
+    <PackageReference Include="protobuf-net.Grpc" Version="1.0.171" />
   </ItemGroup>
 
   <PropertyGroup>
