@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Service.Unlimint.Webhooks.Domain.Models\Service.Unlimint.Webhooks.Domain.Models.csproj" />
+  </ItemGroup>
+
 </Project>

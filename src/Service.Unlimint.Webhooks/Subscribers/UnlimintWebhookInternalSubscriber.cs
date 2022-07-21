@@ -20,17 +20,20 @@ namespace Service.Unlimint.Webhooks.Subscribers
         private readonly ILogger<UnlimintWebhookInternalSubscriber> _logger;
         private readonly IUnlimintPaymentsService _unlimintPaymentsService;
         private readonly IServiceBusPublisher<SignalUnlimintTransfer> _transferPublisher;
+        private readonly IServiceBusPublisher<SignalUnlimintTransferFailed> _failPublisher;
 
         public UnlimintWebhookInternalSubscriber(
             ILogger<UnlimintWebhookInternalSubscriber> logger,
-            ISubscriber<WebhookQueueItem> subscriber, 
-            IUnlimintPaymentsService unlimintPaymentsService, 
-            IServiceBusPublisher<SignalUnlimintTransfer> transferPublisher)
+            ISubscriber<WebhookQueueItem> subscriber,
+            IUnlimintPaymentsService unlimintPaymentsService,
+            IServiceBusPublisher<SignalUnlimintTransfer> transferPublisher,
+            IServiceBusPublisher<SignalUnlimintTransferFailed> failPublisher)
         {
             subscriber.Subscribe(HandleSignal);
             _logger = logger;
             _unlimintPaymentsService = unlimintPaymentsService;
             _transferPublisher = transferPublisher;
+            this._failPublisher = failPublisher;
         }
 
         private async ValueTask HandleSignal(WebhookQueueItem webhook)
@@ -49,51 +52,67 @@ namespace Service.Unlimint.Webhooks.Subscribers
 
                     if (paymentData != null)
                     {
-                        
-                        var (brokerId, clientId, walletId) = ParseDescription(paymentData.Note);
-                        var payment = await _unlimintPaymentsService.GetUnlimintPaymentByIdAsync(
-                            new GetPaymentByIdRequest
-                            {
-                                BrokerId = brokerId,
-                                PaymentId = callback.PaymentData.Id,
-                            });
 
-                        if (payment.Data != null)
+                        if (!string.IsNullOrEmpty(paymentData.Note))
                         {
-                            _logger.LogInformation("GetUnlimintPaymentByMerchantIdAsync payment info {paymentInfo}",
-                                Newtonsoft.Json.JsonConvert.SerializeObject(payment.Data));
-                        }
-
-                        if (payment.IsSuccess)
-                        {
-                            await _transferPublisher.PublishAsync(new SignalUnlimintTransfer()
-                            {
-                                BrokerId = brokerId,
-                                ClientId = clientId,
-                                WalletId = walletId,
-                                PaymentInfo = new GetPaymentInfo
+                            var (brokerId, clientId, walletId) = ParseDescription(paymentData.Note);
+                            var payment = await _unlimintPaymentsService.GetUnlimintPaymentByIdAsync(
+                                new GetPaymentByIdRequest
                                 {
-                                    Id = callback.PaymentData.Id,
-                                    Type = payment.Data?.Type,
-                                    MerchantId = payment.Data?.MerchantId,
-                                    MerchantWalletId = payment.Data?.MerchantWalletId,
-                                    Description = payment.Data?.Description,
-                                    Status = payment.Data?.Status,
-                                    Amount = payment.Data?.Amount,
-                                    Fee = payment.Data?.Fee,
-                                    Card = payment.Data?.Card,
-                                    TrackingRef = payment.Data?.TrackingRef,
-                                    ErrorCode = payment.Data?.ErrorCode,
-                                    Metadata = payment.Data?.Metadata,
-                                    CreateDate = payment.Data?.CreateDate,
-                                }
-                                
-                            });
+                                    BrokerId = brokerId,
+                                    PaymentId = callback.PaymentData.Id,
+                                });
+
+                            if (payment.Data != null)
+                            {
+                                _logger.LogInformation("GetUnlimintPaymentByMerchantIdAsync payment info {paymentInfo}",
+                                    Newtonsoft.Json.JsonConvert.SerializeObject(payment.Data));
+                            }
+
+                            if (payment.IsSuccess)
+                            {
+                                await _transferPublisher.PublishAsync(new SignalUnlimintTransfer()
+                                {
+                                    BrokerId = brokerId,
+                                    ClientId = clientId,
+                                    WalletId = walletId,
+                                    PaymentInfo = new GetPaymentInfo
+                                    {
+                                        Id = callback.PaymentData.Id,
+                                        Type = payment.Data?.Type,
+                                        MerchantId = payment.Data?.MerchantId,
+                                        MerchantWalletId = payment.Data?.MerchantWalletId,
+                                        Description = payment.Data?.Description,
+                                        Status = payment.Data?.Status,
+                                        Amount = payment.Data?.Amount,
+                                        Fee = payment.Data?.Fee,
+                                        Card = payment.Data?.Card,
+                                        TrackingRef = payment.Data?.TrackingRef,
+                                        ErrorCode = payment.Data?.ErrorCode,
+                                        Metadata = payment.Data?.Metadata,
+                                        CreateDate = payment.Data?.CreateDate,
+                                    }
+
+                                });
+                            }
+                            else
+                            {
+                                _logger.LogError("Unable to get payment info merchantId: {merchantId} paymentId:{paymentId}",
+                                    callback.MerchantOrder?.Id, paymentData.Id);
+                            }
                         }
                         else
                         {
-                            _logger.LogError("Unable to get payment info merchantId: {merchantId} paymentId:{paymentId}", 
-                                callback.MerchantOrder?.Id, paymentData.Id);
+                            if (callback.PaymentData.Status == PaymentStatus.Declined ||
+                                callback.PaymentData.Status == PaymentStatus.Cancelled ||
+                                callback.PaymentData.Status == PaymentStatus.Terminated)
+                                await _failPublisher.PublishAsync(new SignalUnlimintTransferFailed()
+                                {
+                                    MerchantOrderId = callback.MerchantOrder.Id,
+                                    DeclineCode = callback.PaymentData?.DeclineCode,
+                                    DeclineReason = callback.PaymentData?.DeclineReason,
+                                    Status = callback.PaymentData.Status
+                                });
                         }
                     }
                     else

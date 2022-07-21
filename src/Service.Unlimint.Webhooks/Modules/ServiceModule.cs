@@ -23,6 +23,10 @@ namespace Service.Unlimint.Webhooks.Modules
                     SignalUnlimintTransfer.ServiceBusTopicName, true);
 
             builder
+                .RegisterMyServiceBusPublisher<SignalUnlimintTransferFailed>(serviceBusClient,
+                    SignalUnlimintTransferFailed.ServiceBusTopicName, true);
+
+            builder
                .RegisterMyServiceBusPublisher<WebhookQueueItem>(
                    serviceBusClient,
                    Topics.CircleWebhookInternalTopic, 
