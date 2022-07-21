@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference PrivateAssets="All" Include="..\Service.Unlimint.Webhook.ServiceBus\Service.Unlimint.Webhook.ServiceBus.csproj" />
     <ProjectReference PrivateAssets="All" Include="..\Service.Unlimint.Webhooks.Domain.Models\Service.Unlimint.Webhooks.Domain.Models.csproj" />
     <ProjectReference PrivateAssets="All" Include="..\Service.Unlimint.Webhooks.Grpc\Service.Unlimint.Webhooks.Grpc.csproj" />
   </ItemGroup>
