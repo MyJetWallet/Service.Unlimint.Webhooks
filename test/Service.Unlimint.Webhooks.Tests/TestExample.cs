@@ -28,7 +28,7 @@ namespace Service.Unlimint.Webhooks.Tests
                 {
                     Id = null,
                     Type = null,
-                    MerchantId = null,
+                    MerchantOrderId = null,
                     MerchantWalletId = null,
                     Description = null,
                     Status = callbackFull?.PaymentData.Status,
