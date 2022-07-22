@@ -6,8 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MyJetWallet.Service.Unlimint.Signer.Client" Version="2.0.8" />
-    <PackageReference Include="MyJetWallet.Unlimint" Version="2.1.0" />
+    <PackageReference Include="MyJetWallet.Service.Unlimint.Signer.Client" Version="2.1.0" />
+    <PackageReference Include="MyJetWallet.Unlimint" Version="2.1.1" />
   </ItemGroup>
 
 </Project>
