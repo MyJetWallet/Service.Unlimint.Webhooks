@@ -80,7 +80,7 @@ namespace Service.Unlimint.Webhooks.Subscribers
                                     {
                                         Id = callback.PaymentData.Id,
                                         Type = payment.Data?.Type,
-                                        MerchantId = payment.Data?.MerchantId,
+                                        MerchantOrderId = payment.Data?.MerchantOrderId,
                                         MerchantWalletId = payment.Data?.MerchantWalletId,
                                         Description = payment.Data?.Description,
                                         Status = payment.Data?.Status,
@@ -97,22 +97,14 @@ namespace Service.Unlimint.Webhooks.Subscribers
                             }
                             else
                             {
-                                _logger.LogError("Unable to get payment info merchantId: {merchantId} paymentId:{paymentId}",
-                                    callback.MerchantOrder?.Id, paymentData.Id);
+                                _logger.LogError("Unable to get payment info callback: {callback}",
+                                    webhook.Data);
+                                throw new Exception("Retry get payment");
                             }
                         }
                         else
                         {
-                            if (callback.PaymentData.Status == PaymentStatus.Declined ||
-                                callback.PaymentData.Status == PaymentStatus.Cancelled ||
-                                callback.PaymentData.Status == PaymentStatus.Terminated)
-                                await _failPublisher.PublishAsync(new SignalUnlimintTransferFailed()
-                                {
-                                    MerchantOrderId = callback.MerchantOrder.Id,
-                                    DeclineCode = callback.PaymentData?.DeclineCode,
-                                    DeclineReason = callback.PaymentData?.DeclineReason,
-                                    Status = callback.PaymentData.Status
-                                });
+                            await SendFailedIfMeetConditions(callback);
                         }
                     }
                     else
@@ -127,6 +119,21 @@ namespace Service.Unlimint.Webhooks.Subscribers
                 ex.FailActivity();
                 throw;
             }
+        }
+
+        private async Task SendFailedIfMeetConditions(PaymentCallback callback)
+        {
+            if (callback.PaymentData.Status == PaymentStatus.Declined ||
+                                            callback.PaymentData.Status == PaymentStatus.Cancelled ||
+                                            callback.PaymentData.Status == PaymentStatus.Terminated ||
+                                            callback.PaymentData.Status == PaymentStatus.Voided)
+                await _failPublisher.PublishAsync(new SignalUnlimintTransferFailed()
+                {
+                    MerchantOrderId = callback.MerchantOrder.Id,
+                    DeclineCode = callback.PaymentData?.DeclineCode,
+                    DeclineReason = callback.PaymentData?.DeclineReason,
+                    Status = callback.PaymentData.Status
+                });
         }
 
         public (string, string, string) ParseDescription(string description)
