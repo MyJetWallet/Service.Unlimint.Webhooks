@@ -53,7 +53,7 @@ namespace Service.Unlimint.Webhooks.Subscribers
                     if (paymentData != null)
                     {
 
-                        if (!string.IsNullOrEmpty(paymentData.Note))
+                        if (!string.IsNullOrEmpty(paymentData.Note) && !string.IsNullOrEmpty(callback.PaymentData.Id))
                         {
                             var (brokerId, clientId, walletId) = ParseDescription(paymentData.Note);
                             var payment = await _unlimintPaymentsService.GetUnlimintPaymentByIdAsync(
